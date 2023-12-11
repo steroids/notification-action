@@ -28915,7 +28915,7 @@ function getCommitMessageHtml(message) {
     return `<code> - ${message}</code>`;
 }
 const isUpdateVersion = (message) => message.includes(UPDATE_VERSION_TEXT);
-const transformCommit = (commitMessage) => commitMessage.split('\n')
+const getTransformCommit = (commitMessage) => commitMessage.split('\n')
     .filter(message => !(isUpdateVersion(message) || !message));
 function sendMessageTelegram(to, token, message) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -28941,13 +28941,15 @@ function main() {
                 return;
             }
             const packageJson = (0, getPackage_1.default)();
+            const newVersionTag = '#newVersion';
+            const divider = '';
             const telegramMessageArray = [
-                '#newVersion',
+                newVersionTag,
                 getHeaderMessageHtml(packageJson),
-                ''
+                divider
             ];
             commits.forEach((commit) => {
-                const arrayOfChanges = transformCommit(commit.message).map(getCommitMessageHtml);
+                const arrayOfChanges = getTransformCommit(commit.message).map(getCommitMessageHtml);
                 telegramMessageArray.push(...arrayOfChanges);
             });
             sendMessageTelegram(to, token, telegramMessageArray.join('\n'))

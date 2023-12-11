@@ -2,14 +2,14 @@ import * as fs from 'fs'
 import * as core from '@actions/core';
 import path = require("path");
 
-export interface PackageJson {
+export interface IPackageJson {
     name: string,
     version: string,
 }
 
-export default function(): PackageJson {
+export default function(): IPackageJson {
     const pathPackage = path.join(core.getInput('path'), 'package.json');
-    const packageProject: PackageJson = {
+    const packageProject: IPackageJson = {
         name: '',
         version: '',
     };

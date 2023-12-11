@@ -1,15 +1,15 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import getPackage, { PackageJson } from './getPackage';
+import getPackage, { IPackageJson } from './getPackage';
 
-interface Commit {
+interface ICommit {
   message: string,
   distinct: boolean
 }
 
 const UPDATE_VERSION_TEXT = 'Update version';
 
-function getHeaderMessageHtml(packageJson: PackageJson): string {
+function getHeaderMessageHtml(packageJson: IPackageJson): string {
     return  `<code><strong>${packageJson.name}: ${packageJson.version}</strong></code>`;
 }
 
@@ -19,7 +19,7 @@ function getCommitMessageHtml(message: string): string {
 
 const isUpdateVersion = (message: string): boolean =>  message.includes(UPDATE_VERSION_TEXT);
 
-const transformCommit = (commitMessage: string): string[] => commitMessage.split('\n')
+const getTransformCommit = (commitMessage: string): string[] => commitMessage.split('\n')
     .filter(message => !(isUpdateVersion(message) || !message));
 
 async function sendMessageTelegram(to: string, token: string, message: string) {
@@ -39,22 +39,24 @@ async function main() {
   try {
         const to = core.getInput('to');
         const token = core.getInput('token');
-        const commits = github.context.payload.commits.filter((commit: Commit) => commit.distinct && isUpdateVersion(commit.message));
+        const commits = github.context.payload.commits.filter((commit: ICommit) => commit.distinct && isUpdateVersion(commit.message));
 
         if(commits.length < 1) {
             return;
         }
 
         const packageJson = getPackage();
+        const newVersionTag = '#newVersion';
+        const divider = '';
         
         const telegramMessageArray = [
-            '#newVersion',
+            newVersionTag,
             getHeaderMessageHtml(packageJson), 
-            ''
+            divider
         ];
 
-        commits.forEach((commit: Commit) => {
-            const arrayOfChanges = transformCommit(commit.message).map(getCommitMessageHtml);
+        commits.forEach((commit: ICommit) => {
+            const arrayOfChanges = getTransformCommit(commit.message).map(getCommitMessageHtml);
             telegramMessageArray.push(...arrayOfChanges);
         })
 
