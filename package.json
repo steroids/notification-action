@@ -1,0 +1,40 @@
+{
+  "name": "notification-action",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "ncc build ./src/main.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/steroids/notification-action.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/steroids/notification-action/issues"
+  },
+  "homepage": "https://github.com/steroids/notification-action#readme",
+  "dependencies": {
+    "@actions/core": "^1.10.1",
+    "@actions/github": "^6.0.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.11.0",
+    "@typescript-eslint/parser": "^6.11.0",
+    "@vercel/ncc": "^0.38.1",
+    "eslint": "^8.54.0",
+    "eslint-plugin-github": "^4.10.1",
+    "eslint-plugin-jest": "^27.6.0",
+    "eslint-plugin-jsonc": "^2.10.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "make-coverage-badge": "^1.2.0",
+    "prettier": "^3.1.0",
+    "prettier-eslint": "^16.1.2",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.2.2"
+  }
+}

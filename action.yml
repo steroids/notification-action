@@ -1,0 +1,11 @@
+name: 'Telegram notifications'
+inputs:
+  to:
+    description: 'Telegram id chat for notifications'
+    required: true
+  token:
+    description: 'Bot token'
+    required: true
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
