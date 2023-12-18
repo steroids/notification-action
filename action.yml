@@ -6,6 +6,9 @@ inputs:
   token:
     description: 'Bot token'
     required: true
+  git_token:
+    description: 'GitHub token'
+    required: true
 runs:
   using: 'node20'
   main: 'dist/index.js'
