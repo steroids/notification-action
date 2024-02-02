@@ -1,14 +1,22 @@
 import * as core from '@actions/core'
+import * as github from '@actions/github'
 import getPackage, { IPackageJson } from './getPackage';
-import findTag from './findTag';
+import getLatestUpdate from './getLatestUpdate';
+import createTag from './createTag';
 
+interface ICommit {
+    message: string,
+    distinct: boolean
+}
+
+const UPDATE_VERSION_TEXT = 'Update version';
 
 function getHeaderMessageHtml(packageJson: IPackageJson): string {
     return  `<code><strong>${packageJson.name}: ${packageJson.version}</strong></code>`;
 }
 
 function getCommitMessageHtml(message: string): string {
-    return  `<code> - ${message}</code>`;
+    return  `<code>${message}</code>`;
 }
 
 async function sendMessageTelegram(to: string, token: string, message: string) {
@@ -24,26 +32,38 @@ async function sendMessageTelegram(to: string, token: string, message: string) {
     }).then(data => data.json())
 }
 
+function isCommitUpdateVersion(commits: ICommit[]) {
+    return commits.filter((commit) => commit.distinct && commit.message.includes(UPDATE_VERSION_TEXT)).length > 0;
+}
+
 async function main() {
   try {
-        const to = core.getInput('to');
-        const token = core.getInput('token');
-        const gitHubToken = core.getInput('git_token');
-
-        const tag = await findTag(gitHubToken);
-        const tagMessage = (tag?.data.message ?? '').trim();
-
-        if (!tagMessage) {
+        if (!isCommitUpdateVersion(github.context.payload.commits)) {
             return;
         }
 
+        const to = core.getInput('to');
+        const token = core.getInput('token');
+        const gitHubToken = core.getInput('git_token');
+        const latestUpdate = getLatestUpdate();
         const packageJson = getPackage();
+
+        if (!latestUpdate.version) {
+            return;
+        }
+
+        if (latestUpdate.version !== packageJson.version) {
+            core.setFailed('Last version in CHANGELOG not equal version in package.json');
+            return;
+        }
+
+        await createTag(gitHubToken, 'v' + latestUpdate.version, latestUpdate.changed.join('\n'));
         
         const telegramMessageArray = [
             '#newVersion',
             getHeaderMessageHtml(packageJson), 
             '',
-            ...tagMessage.split(/\-\s/).filter(Boolean).map(getCommitMessageHtml),
+            ...latestUpdate.changed.map(getCommitMessageHtml),
         ];
 
         sendMessageTelegram(to, token, telegramMessageArray.join('\n'))
