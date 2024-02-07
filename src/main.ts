@@ -38,6 +38,7 @@ function isCommitUpdateVersion(commits: ICommit[]) {
 
 async function main() {
   try {
+        // Запуск кода произойдет в том случае если коммит называется 'Update version'
         if (!isCommitUpdateVersion(github.context.payload.commits)) {
             return;
         }
@@ -57,6 +58,7 @@ async function main() {
             return;
         }
 
+        // Создание тега с названием "v3.0.5" и с сообщением в виде списка изменений
         await createTag(gitHubToken, 'v' + latestUpdate.version, latestUpdate.changed.join('\n'));
         
         const telegramMessageArray = [

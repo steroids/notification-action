@@ -7,6 +7,10 @@ export interface IPackageJson {
     version: string,
 }
 
+/**
+ * Проверяет существования файла ./package.json и возвращает его
+ * @returns IPackageJson
+ */
 export default function(): IPackageJson {
     const pathPackage = path.join(core.getInput('path'), 'package.json');
     const packageProject: IPackageJson = {
