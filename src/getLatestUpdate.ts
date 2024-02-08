@@ -10,6 +10,10 @@ export interface ILatestUpdate {
 const changelogFilePath = 'CHANGELOG.md';
 const versionReg = /^##\sv([0-9\.]+)\s/;
 
+/**
+ * Ищет в файле ./CHANGELOG.md последнюю версию и список изменений к этой версии
+ * @returns ILatestUpdate
+ */
 export default function(): ILatestUpdate {
     const latestUpdate: ILatestUpdate = {
         version: '',
@@ -26,6 +30,13 @@ export default function(): ILatestUpdate {
     const file = fs.readFileSync(pathChangelog, 'utf-8');
     const lines = file.split('\n');
 
+    /**
+     * Проходится по строкам файла в поисках последней версии "## v3.0.6"
+     * и собирает все изменения до следующей версии "## v3.0.5"
+     * при этом убирает спец символы разметки Markdown
+     *      ### Added => Added
+     *      ### Fixed => Fixed
+     */
     for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
         const line: string = lines[lineIndex];
         const versionFound = line.match(versionReg);
